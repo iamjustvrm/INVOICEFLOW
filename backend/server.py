@@ -38,7 +38,7 @@ UPLOADS_DIR.mkdir(exist_ok=True)
 PDFS_DIR.mkdir(exist_ok=True)
 
 # Initialize services
-csv_parser = CSVParser()
+csv_parser = CSVParserV2()
 pdf_generator = PDFGenerator()
 tax_service = TaxService()
 
@@ -184,9 +184,9 @@ async def upload_csv(
     upload_dict['created_at'] = upload_dict['created_at'].isoformat()
     await db.uploads.insert_one(upload_dict)
     
-    # Parse CSV
+    # Parse CSV using the new v2 parser
     try:
-        invoices_data, error = csv_parser.parse_csv(str(file_path))
+        invoices_data, error, metadata = csv_parser.parse_csv(str(file_path))
         
         if error:
             # Update upload status
