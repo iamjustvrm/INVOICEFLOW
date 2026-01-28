@@ -126,10 +126,21 @@ class CSVParser:
         first_row = df.iloc[0]
         
         # Extract invoice-level data from first row
+        invoice_number = str(first_row.get(mapping.get('invoice_number', ''), '')).strip()
+        if not invoice_number:
+            invoice_number = f"INV-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+        
+        invoice_date = self.parse_date(first_row.get(mapping.get('invoice_date', '')))
+        if not invoice_date:
+            invoice_date = datetime.now()
+        
+        due_date_raw = first_row.get(mapping.get('due_date', ''))
+        due_date = self.parse_date(due_date_raw) if 'due_date' in mapping else None
+        
         invoice_data = {
-            'invoice_number': str(first_row.get(mapping.get('invoice_number', ''), '')).strip() or f"INV-{datetime.now().strftime('%Y%m%d%H%M%S')}",
-            'invoice_date': self.parse_date(first_row.get(mapping.get('invoice_date', ''), datetime.now())),
-            'due_date': self.parse_date(first_row.get(mapping.get('due_date', ''))) if 'due_date' in mapping else None,
+            'invoice_number': invoice_number,
+            'invoice_date': invoice_date,
+            'due_date': due_date,
             'client_name': str(first_row.get(mapping.get('client_name', ''), 'Unknown Client')).strip(),
             'client_email': str(first_row.get(mapping.get('client_email', ''), '')).strip() if 'client_email' in mapping else None,
             'client_address': str(first_row.get(mapping.get('client_address', ''), '')).strip() if 'client_address' in mapping else None,
