@@ -15,205 +15,185 @@ class PDFGenerator:
         self.templates_dir.mkdir(exist_ok=True)
         self.styles = getSampleStyleSheet()
     
-    def _modern_template(self, invoice: Dict[str, Any], branding: Dict[str, Any]) -> str:
-        """Modern professional template"""
-        primary_color = branding.get('primary_color', '#3B82F6')
-        logo_url = branding.get('logo_url', '')
-        
-        line_items_html = ''
-        for item in invoice.get('line_items', []):
-            line_items_html += f"""
-            <tr>
-                <td style="padding: 12px; border-bottom: 1px solid #E5E7EB;">{item['description']}</td>
-                <td style="padding: 12px; border-bottom: 1px solid #E5E7EB; text-align: center;">{item['quantity']}</td>
-                <td style="padding: 12px; border-bottom: 1px solid #E5E7EB; text-align: right;">${item['rate']:.2f}</td>
-                <td style="padding: 12px; border-bottom: 1px solid #E5E7EB; text-align: right; font-weight: 600;">${item['amount']:.2f}</td>
-            </tr>
-            """
-        
-        invoice_date = invoice.get('invoice_date', '').strftime('%B %d, %Y') if isinstance(invoice.get('invoice_date'), object) else ''
-        due_date = invoice.get('due_date', '').strftime('%B %d, %Y') if invoice.get('due_date') and isinstance(invoice.get('due_date'), object) else 'Upon Receipt'
-        
-        html = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <style>
-                @page {{
-                    size: A4;
-                    margin: 2cm;
-                }}
-                body {{
-                    font-family: 'Helvetica', 'Arial', sans-serif;
-                    color: #1F2937;
-                    line-height: 1.6;
-                }}
-                .header {{
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 40px;
-                    padding-bottom: 20px;
-                    border-bottom: 3px solid {primary_color};
-                }}
-                .logo {{
-                    max-width: 200px;
-                    max-height: 80px;
-                }}
-                .invoice-title {{
-                    font-size: 36px;
-                    font-weight: bold;
-                    color: {primary_color};
-                }}
-                .info-section {{
-                    margin-bottom: 30px;
-                }}
-                .info-grid {{
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 30px;
-                }}
-                .info-box {{
-                    background: #F9FAFB;
-                    padding: 20px;
-                    border-radius: 8px;
-                }}
-                .info-label {{
-                    font-size: 12px;
-                    color: #6B7280;
-                    text-transform: uppercase;
-                    margin-bottom: 5px;
-                }}
-                .info-value {{
-                    font-size: 14px;
-                    font-weight: 600;
-                }}
-                table {{
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin: 30px 0;
-                }}
-                th {{
-                    background: {primary_color};
-                    color: white;
-                    padding: 12px;
-                    text-align: left;
-                    font-weight: 600;
-                }}
-                .totals {{
-                    margin-top: 30px;
-                    text-align: right;
-                }}
-                .total-row {{
-                    display: flex;
-                    justify-content: flex-end;
-                    padding: 8px 0;
-                }}
-                .total-label {{
-                    width: 150px;
-                    text-align: right;
-                    padding-right: 20px;
-                }}
-                .total-value {{
-                    width: 100px;
-                    text-align: right;
-                    font-weight: 600;
-                }}
-                .grand-total {{
-                    font-size: 20px;
-                    color: {primary_color};
-                    border-top: 2px solid {primary_color};
-                    padding-top: 15px;
-                    margin-top: 10px;
-                }}
-                .notes {{
-                    margin-top: 40px;
-                    padding: 20px;
-                    background: #F9FAFB;
-                    border-left: 4px solid {primary_color};
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <div>
-                    {'<img class="logo" src="' + logo_url + '" />' if logo_url else ''}
-                </div>
-                <div class="invoice-title">INVOICE</div>
-            </div>
-            
-            <div class="info-section">
-                <div class="info-grid">
-                    <div class="info-box">
-                        <div class="info-label">Invoice Number</div>
-                        <div class="info-value">{invoice.get('invoice_number', '')}</div>
-                    </div>
-                    <div class="info-box">
-                        <div class="info-label">Invoice Date</div>
-                        <div class="info-value">{invoice_date}</div>
-                    </div>
-                    <div class="info-box">
-                        <div class="info-label">Bill To</div>
-                        <div class="info-value">{invoice.get('client_name', '')}</div>
-                        {'<div style="font-size: 12px; color: #6B7280; margin-top: 5px;">' + invoice.get('client_address', '') + '</div>' if invoice.get('client_address') else ''}
-                        {'<div style="font-size: 12px; color: #6B7280;">' + invoice.get('client_email', '') + '</div>' if invoice.get('client_email') else ''}
-                    </div>
-                    <div class="info-box">
-                        <div class="info-label">Due Date</div>
-                        <div class="info-value">{due_date}</div>
-                    </div>
-                </div>
-            </div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>Description</th>
-                        <th style="text-align: center; width: 80px;">Qty</th>
-                        <th style="text-align: right; width: 100px;">Rate</th>
-                        <th style="text-align: right; width: 100px;">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {line_items_html}
-                </tbody>
-            </table>
-            
-            <div class="totals">
-                <div class="total-row">
-                    <div class="total-label">Subtotal:</div>
-                    <div class="total-value">${invoice.get('subtotal', 0):.2f}</div>
-                </div>
-                {f'<div class="total-row"><div class="total-label">Tax ({invoice.get("tax_rate", 0):.2f}%):</div><div class="total-value">${invoice.get("tax_amount", 0):.2f}</div></div>' if invoice.get('tax_amount', 0) > 0 else ''}
-                <div class="total-row grand-total">
-                    <div class="total-label">Total:</div>
-                    <div class="total-value">${invoice.get('total', 0):.2f}</div>
-                </div>
-            </div>
-            
-            {f'<div class="notes"><strong>Notes:</strong><br>{invoice.get("notes", "")}</div>' if invoice.get('notes') else ''}
-        </body>
-        </html>
-        """
-        return html
-    
-    def _classic_template(self, invoice: Dict[str, Any], branding: Dict[str, Any]) -> str:
-        """Classic business template"""
-        # Similar structure but with classic styling
-        return self._modern_template(invoice, branding)  # Simplified for now
-    
-    def _minimal_template(self, invoice: Dict[str, Any], branding: Dict[str, Any]) -> str:
-        """Minimal clean template"""
-        # Similar structure but with minimal styling
-        return self._modern_template(invoice, branding)  # Simplified for now
+    def _parse_color(self, color_hex: str):
+        """Convert hex color to ReportLab color"""
+        try:
+            color_hex = color_hex.lstrip('#')
+            return colors.HexColor('#' + color_hex)
+        except:
+            return colors.HexColor('#3B82F6')
     
     def generate_pdf(self, invoice_data: Dict[str, Any], branding: Dict[str, Any], output_path: str) -> bool:
-        """Generate PDF from invoice data"""
+        """Generate PDF from invoice data using ReportLab"""
         try:
-            html_content = self.generate_invoice_html(invoice_data, branding)
-            HTML(string=html_content).write_pdf(output_path)
+            # Create the PDF object
+            doc = SimpleDocTemplate(
+                output_path,
+                pagesize=letter,
+                rightMargin=inch*0.75,
+                leftMargin=inch*0.75,
+                topMargin=inch*0.75,
+                bottomMargin=inch*0.75,
+            )
+            
+            # Container for the 'Flowable' objects
+            elements = []
+            
+            # Get branding colors
+            primary_color = self._parse_color(branding.get('primary_color', '#3B82F6'))
+            
+            # Title
+            title_style = ParagraphStyle(
+                'CustomTitle',
+                parent=self.styles['Heading1'],
+                fontSize=28,
+                textColor=primary_color,
+                spaceAfter=30,
+                alignment=TA_CENTER
+            )
+            elements.append(Paragraph("INVOICE", title_style))
+            elements.append(Spacer(1, 0.3*inch))
+            
+            # Invoice info section
+            invoice_date = invoice_data.get('invoice_date', '')
+            if isinstance(invoice_date, str):
+                try:
+                    invoice_date = datetime.fromisoformat(invoice_date).strftime('%B %d, %Y')
+                except:
+                    invoice_date = str(invoice_date)
+            elif hasattr(invoice_date, 'strftime'):
+                invoice_date = invoice_date.strftime('%B %d, %Y')
+            else:
+                invoice_date = str(invoice_date)
+            
+            due_date = invoice_data.get('due_date', 'Upon Receipt')
+            if due_date and due_date != 'Upon Receipt':
+                if isinstance(due_date, str):
+                    try:
+                        due_date = datetime.fromisoformat(due_date).strftime('%B %d, %Y')
+                    except:
+                        due_date = str(due_date)
+                elif hasattr(due_date, 'strftime'):
+                    due_date = due_date.strftime('%B %d, %Y')
+            
+            info_data = [
+                ['Invoice Number:', invoice_data.get('invoice_number', '')],
+                ['Invoice Date:', invoice_date],
+                ['Due Date:', due_date],
+                ['', ''],
+                ['Bill To:', invoice_data.get('client_name', '')],
+            ]
+            
+            if invoice_data.get('client_address'):
+                info_data.append(['Address:', invoice_data.get('client_address', '')])
+            if invoice_data.get('client_email'):
+                info_data.append(['Email:', invoice_data.get('client_email', '')])
+            
+            info_table = Table(info_data, colWidths=[1.5*inch, 4*inch])
+            info_table.setStyle(TableStyle([
+                ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('TEXTCOLOR', (0, 0), (0, -1), colors.grey),
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                ('BACKGROUND', (0, 0), (-1, -1), colors.Color(0.97, 0.98, 0.99)),
+                ('PADDING', (0, 0), (-1, -1), 12),
+            ]))
+            
+            elements.append(info_table)
+            elements.append(Spacer(1, 0.5*inch))
+            
+            # Line items table
+            line_items_data = [['Description', 'Qty', 'Rate', 'Amount']]
+            
+            for item in invoice_data.get('line_items', []):
+                line_items_data.append([
+                    Paragraph(item.get('description', ''), self.styles['Normal']),
+                    str(item.get('quantity', 1)),
+                    f"${item.get('rate', 0):.2f}",
+                    f"${item.get('amount', 0):.2f}"
+                ])
+            
+            line_items_table = Table(
+                line_items_data,
+                colWidths=[3.5*inch, 0.8*inch, inch, inch]
+            )
+            
+            line_items_table.setStyle(TableStyle([
+                # Header row
+                ('BACKGROUND', (0, 0), (-1, 0), primary_color),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (1, 0), (-1, 0), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 11),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('TOPPADDING', (0, 0), (-1, 0), 12),
+                
+                # Body
+                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 1), (-1, -1), 10),
+                ('ALIGN', (1, 1), (-1, -1), 'RIGHT'),
+                ('ALIGN', (0, 1), (0, -1), 'LEFT'),
+                ('VALIGN', (0, 1), (-1, -1), 'TOP'),
+                ('LINEBELOW', (0, 1), (-1, -1), 0.5, colors.Color(0.9, 0.9, 0.9)),
+                ('TOPPADDING', (0, 1), (-1, -1), 10),
+                ('BOTTOMPADDING', (0, 1), (-1, -1), 10),
+            ]))
+            
+            elements.append(line_items_table)
+            elements.append(Spacer(1, 0.3*inch))
+            
+            # Totals section
+            subtotal = invoice_data.get('subtotal', 0)
+            tax_rate = invoice_data.get('tax_rate', 0)
+            tax_amount = invoice_data.get('tax_amount', 0)
+            total = invoice_data.get('total', 0)
+            
+            totals_data = [
+                ['Subtotal:', f"${subtotal:.2f}"],
+            ]
+            
+            if tax_amount > 0:
+                totals_data.append([f'Tax ({tax_rate:.2f}%):', f"${tax_amount:.2f}"])
+            
+            totals_data.append(['Total:', f"${total:.2f}"])
+            
+            totals_table = Table(totals_data, colWidths=[4.8*inch, 1.7*inch])
+            totals_table.setStyle(TableStyle([
+                ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+                ('FONTNAME', (0, 0), (0, -2), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 11),
+                ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, -1), (-1, -1), 14),
+                ('TEXTCOLOR', (0, -1), (-1, -1), primary_color),
+                ('LINEABOVE', (0, -1), (-1, -1), 2, primary_color),
+                ('TOPPADDING', (0, -1), (-1, -1), 15),
+                ('BOTTOMPADDING', (0, 0), (-1, -2), 8),
+            ]))
+            
+            elements.append(totals_table)
+            
+            # Notes section
+            if invoice_data.get('notes'):
+                elements.append(Spacer(1, 0.5*inch))
+                notes_style = ParagraphStyle(
+                    'Notes',
+                    parent=self.styles['Normal'],
+                    fontSize=10,
+                    textColor=colors.grey,
+                    leftIndent=10,
+                    borderWidth=1,
+                    borderColor=primary_color,
+                    borderPadding=10,
+                    backColor=colors.Color(0.97, 0.98, 0.99)
+                )
+                elements.append(Paragraph(f"<b>Notes:</b> {invoice_data.get('notes', '')}", notes_style))
+            
+            # Build PDF
+            doc.build(elements)
             return True
+            
         except Exception as e:
             print(f"Error generating PDF: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return False
