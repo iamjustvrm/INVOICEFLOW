@@ -472,6 +472,14 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
     }
 
 
+# ==================== HEALTH CHECK ====================
+
+@api_router.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    return {"status": "healthy", "service": "invoiceflow-api", "version": "2.0.0"}
+
+
 # Include the router in the main app
 app.include_router(api_router)
 
