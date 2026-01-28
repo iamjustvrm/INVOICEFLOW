@@ -47,13 +47,36 @@ class CSVParser:
     def detect_column_mapping(self, df_columns: List[str]) -> Dict[str, str]:
         """Detect which columns in the CSV correspond to our standard fields"""
         mapping = {}
+        used_columns = set()
         
         for standard_field, variations in self.column_mappings.items():
+            best_match = None
+            best_score = 0
+            best_col = None
+            
             for col in df_columns:
-                match = self.fuzzy_match_column(col, variations)
-                if match:
-                    mapping[standard_field] = col
+                if col in used_columns:
+                    continue
+                    
+                col_lower = col.lower().strip()
+                
+                # Check for exact match first
+                if col_lower in variations:
+                    best_col = col
+                    best_score = 100
                     break
+                
+                # Try fuzzy matching
+                for target in variations:
+                    score = fuzz.ratio(col_lower, target)
+                    if score > best_score and score > 70:
+                        best_score = score
+                        best_match = target
+                        best_col = col
+            
+            if best_col:
+                mapping[standard_field] = best_col
+                used_columns.add(best_col)
         
         return mapping
     
