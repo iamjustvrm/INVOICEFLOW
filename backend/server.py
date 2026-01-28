@@ -18,7 +18,7 @@ from models import (
 from auth import (
     get_password_hash, verify_password, create_access_token, get_current_user
 )
-from csv_parser import CSVParser
+from csv_parser_v2 import CSVParserV2
 from pdf_generator import PDFGenerator
 from tax_service import TaxService
 
