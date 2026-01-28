@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .result { margin-top: 20px; padding: 10px; background: #f0f0f0; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>InvoiceFlow Login Test</h1>
+    
+    <form id="loginForm">
+        <div>
+            <label>Email:</label><br>
+            <input type="email" id="email" value="demo@invoiceflow.com" style="width: 300px; padding: 5px;">
+        </div>
+        <br>
+        <div>
+            <label>Password:</label><br>
+            <input type="password" id="password" value="demo123" style="width: 300px; padding: 5px;">
+        </div>
+        <br>
+        <button type="submit" style="padding: 10px 20px;">Test Login</button>
+    </form>
+    
+    <div id="result" class="result" style="display: none;"></div>
+    
+    <script>
+        const API_URL = window.location.protocol + '//' + window.location.host + '/api';
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('result');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.textContent = 'Testing login...';
+            
+            try {
+                console.log('API URL:', API_URL);
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.innerHTML = `
+                        <strong>✅ Login Successful!</strong><br>
+                        User: ${data.user.full_name}<br>
+                        Email: ${data.user.email}<br>
+                        Token: ${data.access_token.substring(0, 50)}...
+                    `;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = '❌ Login Failed: ' + (data.detail || 'Unknown error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '❌ Error: ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
