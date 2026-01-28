@@ -1,10 +1,25 @@
 from typing import Dict, Optional, List
 import json
+import re
 from pathlib import Path
 
 class TaxService:
     def __init__(self):
         self.tax_rates_db = self._load_tax_rates()
+        # Full state names for better matching
+        self.state_names = {
+            'ALABAMA': 'AL', 'ALASKA': 'AK', 'ARIZONA': 'AZ', 'ARKANSAS': 'AR', 'CALIFORNIA': 'CA',
+            'COLORADO': 'CO', 'CONNECTICUT': 'CT', 'DELAWARE': 'DE', 'FLORIDA': 'FL', 'GEORGIA': 'GA',
+            'HAWAII': 'HI', 'IDAHO': 'ID', 'ILLINOIS': 'IL', 'INDIANA': 'IN', 'IOWA': 'IA',
+            'KANSAS': 'KS', 'KENTUCKY': 'KY', 'LOUISIANA': 'LA', 'MAINE': 'ME', 'MARYLAND': 'MD',
+            'MASSACHUSETTS': 'MA', 'MICHIGAN': 'MI', 'MINNESOTA': 'MN', 'MISSISSIPPI': 'MS', 'MISSOURI': 'MO',
+            'MONTANA': 'MT', 'NEBRASKA': 'NE', 'NEVADA': 'NV', 'NEW HAMPSHIRE': 'NH', 'NEW JERSEY': 'NJ',
+            'NEW MEXICO': 'NM', 'NEW YORK': 'NY', 'NORTH CAROLINA': 'NC', 'NORTH DAKOTA': 'ND', 'OHIO': 'OH',
+            'OKLAHOMA': 'OK', 'OREGON': 'OR', 'PENNSYLVANIA': 'PA', 'RHODE ISLAND': 'RI', 'SOUTH CAROLINA': 'SC',
+            'SOUTH DAKOTA': 'SD', 'TENNESSEE': 'TN', 'TEXAS': 'TX', 'UTAH': 'UT', 'VERMONT': 'VT',
+            'VIRGINIA': 'VA', 'WASHINGTON': 'WA', 'WEST VIRGINIA': 'WV', 'WISCONSIN': 'WI', 'WYOMING': 'WY',
+            'DISTRICT OF COLUMBIA': 'DC', 'WASHINGTON DC': 'DC', 'WASHINGTON D.C.': 'DC'
+        }
     
     def _load_tax_rates(self) -> Dict[str, float]:
         """Load fallback tax rates database"""
@@ -25,15 +40,37 @@ class TaxService:
         }
     
     def extract_state_from_address(self, address: Optional[str]) -> Optional[str]:
-        """Extract state code from address string"""
+        """Extract state code from address string using multiple strategies"""
         if not address:
             return None
         
-        address = address.upper()
+        address_upper = address.upper()
         
-        # Look for state codes
+        # Strategy 1: Look for full state names first (most reliable)
+        for state_name, state_code in self.state_names.items():
+            if state_name in address_upper:
+                return state_code
+        
+        # Strategy 2: Look for state code followed by ZIP code pattern (STATE ZIP)
+        # Pattern: state code followed by optional space and 5-digit ZIP
+        zip_pattern = re.search(r'\b([A-Z]{2})\s*(\d{5}(?:-\d{4})?)\b', address_upper)
+        if zip_pattern:
+            potential_state = zip_pattern.group(1)
+            if potential_state in self.tax_rates_db:
+                return potential_state
+        
+        # Strategy 3: Look for comma-separated city, state pattern
+        # Pattern: ", STATE" where STATE is 2 letters followed by space or end
+        comma_pattern = re.search(r',\s*([A-Z]{2})(?:\s|,|$)', address_upper)
+        if comma_pattern:
+            potential_state = comma_pattern.group(1)
+            if potential_state in self.tax_rates_db:
+                return potential_state
+        
+        # Strategy 4: Look for state code as a standalone word (with word boundaries)
         for state_code in self.tax_rates_db.keys():
-            if state_code in address:
+            pattern = r'\b' + state_code + r'\b'
+            if re.search(pattern, address_upper):
                 return state_code
         
         return None
