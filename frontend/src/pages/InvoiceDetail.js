@@ -143,7 +143,7 @@ const InvoiceDetail = () => {
             </Button>
           ) : (
             <Button
-              onClick={() => window.open(`${process.env.REACT_APP_BACKEND_URL}${invoice.pdf_url}`, '_blank')}
+              onClick={handleViewPDF}
               variant="outline"
             >
               View PDF
