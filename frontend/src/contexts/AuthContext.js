@@ -40,13 +40,24 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (email, password) => {
-    const response = await axios.post(`${API_URL}/auth/login`, { email, password });
-    const { access_token, user: userData } = response.data;
-    setToken(access_token);
-    setUser(userData);
-    localStorage.setItem('token', access_token);
-    axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-    return userData;
+    try {
+      console.log('Login API call to:', `${API_URL}/auth/login`);
+      const response = await axios.post(
+        `${API_URL}/auth/login`, 
+        { email, password },
+        { timeout: 10000 } // 10 second timeout
+      );
+      console.log('Login response received:', response.status);
+      const { access_token, user: userData } = response.data;
+      setToken(access_token);
+      setUser(userData);
+      localStorage.setItem('token', access_token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      return userData;
+    } catch (error) {
+      console.error('Login API error:', error.message, error.response?.status);
+      throw error;
+    }
   };
 
   const register = async (email, password, full_name, organization_name) => {
