@@ -42,6 +42,20 @@ class PDFGenerator:
             # Get branding colors
             primary_color = self._parse_color(branding.get('primary_color', '#3B82F6'))
             
+            # Add logo if available
+            logo_url = branding.get('logo_url')
+            if logo_url and logo_url.startswith('/api/'):
+                # Convert API path to local file path
+                logo_filename = logo_url.split('/')[-1]
+                logo_path = Path(__file__).parent / 'uploads' / logo_filename
+                if logo_path.exists():
+                    try:
+                        logo = Image(str(logo_path), width=2*inch, height=0.8*inch)
+                        elements.append(logo)
+                        elements.append(Spacer(1, 0.2*inch))
+                    except:
+                        pass  # Skip if logo can't be loaded
+            
             # Title
             title_style = ParagraphStyle(
                 'CustomTitle',
@@ -49,7 +63,8 @@ class PDFGenerator:
                 fontSize=28,
                 textColor=primary_color,
                 spaceAfter=30,
-                alignment=TA_CENTER
+                alignment=TA_CENTER,
+                fontName='Helvetica-Bold'
             )
             elements.append(Paragraph("INVOICE", title_style))
             elements.append(Spacer(1, 0.3*inch))
