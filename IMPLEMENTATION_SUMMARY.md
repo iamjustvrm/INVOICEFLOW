@@ -1,7 +1,7 @@
 # 🎉 InvoiceFlow - Fully Functional MVP Complete!
 
 ## Application URL
-**Live Application**: https://invoice-wizard-66.preview.emergentagent.com
+**Live Application**: https://invoice-flow-84.preview.emergentagent.com
 
 ---
 
@@ -192,7 +192,7 @@
 ## 🚀 How to Use
 
 ### 1. **Access the Application**
-Open: https://invoice-wizard-66.preview.emergentagent.com
+Open: https://invoice-flow-84.preview.emergentagent.com
 
 ### 2. **Login with Demo Account**
 - Email: demo@invoiceflow.com
@@ -369,7 +369,7 @@ mongodb   ✅ RUNNING (Database on port 27017)
 ## 📞 Quick Reference
 
 ### Application Access
-- **URL**: https://invoice-wizard-66.preview.emergentagent.com
+- **URL**: https://invoice-flow-84.preview.emergentagent.com
 - **Demo Email**: demo@invoiceflow.com
 - **Demo Password**: demo123
 
@@ -379,7 +379,7 @@ mongodb   ✅ RUNNING (Database on port 27017)
 - **Documentation**: `/app/INVOICEFLOW_README.md`
 
 ### API Base URL
-- **Backend**: `https://invoice-wizard-66.preview.emergentagent.com/api`
+- **Backend**: `https://invoice-flow-84.preview.emergentagent.com/api`
 
 ### Key Commands
 ```bash
