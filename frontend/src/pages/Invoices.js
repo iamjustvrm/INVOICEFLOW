@@ -68,8 +68,32 @@ const Invoices = () => {
     }
   };
 
-  const handleDownloadPDF = (pdfUrl) => {
-    window.open(`${process.env.REACT_APP_BACKEND_URL}${pdfUrl}`, '_blank');
+  const handleDownloadPDF = async (pdfUrl) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}${pdfUrl}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to download PDF');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = pdfUrl.split('/').pop();
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Failed to download PDF', error);
+      alert('Failed to download PDF. Please try again.');
+    }
   };
 
   const getStatusBadge = (status) => {
