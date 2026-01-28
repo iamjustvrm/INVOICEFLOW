@@ -1,0 +1,7 @@
+Invoice #,Date,Customer,Email,Address,Item,Qty,Rate,Amount,Tax,Total
+INV-001,01/15/2024,Acme Corp,acme@example.com,123 Main St New York NY 10001,IT Support - Monthly,1,500.00,500.00,40.00,540.00
+INV-001,01/15/2024,Acme Corp,acme@example.com,123 Main St New York NY 10001,Cloud Backup Service,1,100.00,100.00,8.00,108.00
+INV-002,01/16/2024,TechStart Inc,info@techstart.com,456 Oak Ave Los Angeles CA 90001,Network Monitoring,1,250.00,250.00,18.13,268.13
+INV-002,01/16/2024,TechStart Inc,info@techstart.com,456 Oak Ave Los Angeles CA 90001,Security Updates,2,75.00,150.00,10.88,160.88
+INV-003,01/17/2024,Global Solutions,contact@global.com,789 Pine Rd Austin TX 78701,Website Maintenance,1,300.00,300.00,18.75,318.75
+INV-003,01/17/2024,Global Solutions,contact@global.com,789 Pine Rd Austin TX 78701,Email Hosting,1,50.00,50.00,3.13,53.13
