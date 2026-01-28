@@ -188,14 +188,22 @@ class CSVParser:
     def parse_csv(self, file_path: str) -> Tuple[List[Dict[str, Any]], Optional[str]]:
         """Main parsing function - returns (invoices, error_message)"""
         try:
-            # Try to read as CSV
+            # Determine file type by extension
+            file_ext = file_path.lower().split('.')[-1]
+            
+            # Try to read the file based on extension
             try:
-                df = pd.read_csv(file_path, encoding='utf-8')
-            except UnicodeDecodeError:
-                df = pd.read_csv(file_path, encoding='latin-1')
-            except Exception:
-                # Try Excel
-                df = pd.read_excel(file_path)
+                if file_ext == 'csv':
+                    # Read as CSV
+                    try:
+                        df = pd.read_csv(file_path, encoding='utf-8')
+                    except UnicodeDecodeError:
+                        df = pd.read_csv(file_path, encoding='latin-1')
+                else:
+                    # Read as Excel
+                    df = pd.read_excel(file_path, engine='openpyxl')
+            except Exception as e:
+                return [], f"Could not read file: {str(e)}"
             
             if df.empty:
                 return [], "File is empty"
