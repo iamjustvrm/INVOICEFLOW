@@ -83,6 +83,11 @@ const Invoices = () => {
       
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
+      
+      // Open in new tab for viewing
+      window.open(url, '_blank');
+      
+      // Also trigger download
       const a = document.createElement('a');
       a.href = url;
       a.download = pdfUrl.split('/').pop();
@@ -93,6 +98,28 @@ const Invoices = () => {
     } catch (error) {
       console.error('Failed to download PDF', error);
       alert('Failed to download PDF. Please try again.');
+    }
+  };
+
+  const handleViewPDF = async (pdfUrl) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}${pdfUrl}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to load PDF');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank');
+    } catch (error) {
+      console.error('Failed to view PDF', error);
+      alert('Failed to view PDF. Please try again.');
     }
   };
 
