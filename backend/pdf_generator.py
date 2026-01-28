@@ -1,25 +1,19 @@
-from weasyprint import HTML, CSS
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.lib.enums import TA_RIGHT, TA_CENTER, TA_LEFT
 from typing import Dict, Any, List
 import os
 from pathlib import Path
+from datetime import datetime
 
 class PDFGenerator:
     def __init__(self):
         self.templates_dir = Path(__file__).parent / 'templates'
         self.templates_dir.mkdir(exist_ok=True)
-        
-    def generate_invoice_html(self, invoice_data: Dict[str, Any], branding: Dict[str, Any]) -> str:
-        """Generate HTML for invoice based on template"""
-        template_id = invoice_data.get('template_id', 'modern')
-        
-        if template_id == 'modern':
-            return self._modern_template(invoice_data, branding)
-        elif template_id == 'classic':
-            return self._classic_template(invoice_data, branding)
-        elif template_id == 'minimal':
-            return self._minimal_template(invoice_data, branding)
-        else:
-            return self._modern_template(invoice_data, branding)
+        self.styles = getSampleStyleSheet()
     
     def _modern_template(self, invoice: Dict[str, Any], branding: Dict[str, Any]) -> str:
         """Modern professional template"""
