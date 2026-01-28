@@ -406,6 +406,43 @@ async def update_branding(
     
     return {"message": "Branding updated successfully"}
 
+@api_router.post("/branding/logo")
+async def upload_logo(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    if not current_user.get('organization_id'):
+        raise HTTPException(status_code=400, detail="User must belong to an organization")
+    
+    # Validate file type
+    if not file.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.svg')):
+        raise HTTPException(status_code=400, detail="Only PNG, JPG, JPEG, and SVG files are supported")
+    
+    # Save logo file
+    logo_filename = f"logo_{current_user['organization_id']}_{file.filename}"
+    logo_path = UPLOADS_DIR / logo_filename
+    
+    with open(logo_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    # Update branding with logo URL
+    logo_url = f"/api/branding/logo/{logo_filename}"
+    
+    await db.branding.update_one(
+        {"organization_id": current_user['organization_id']},
+        {"$set": {"logo_url": logo_url}}
+    )
+    
+    return {"logo_url": logo_url, "message": "Logo uploaded successfully"}
+
+@api_router.get("/branding/logo/{filename}")
+async def get_logo(filename: str):
+    logo_path = UPLOADS_DIR / filename
+    if not logo_path.exists():
+        raise HTTPException(status_code=404, detail="Logo not found")
+    
+    return FileResponse(logo_path)
+
 
 # ==================== DASHBOARD STATS ====================
 
