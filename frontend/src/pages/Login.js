@@ -29,10 +29,14 @@ const Login = () => {
     setLoading(true);
     setError('');
     try {
+      console.log('Attempting login with:', loginData.email);
       await login(loginData.email, loginData.password);
+      console.log('Login successful, navigating to dashboard');
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Login failed');
+      console.error('Login error:', err);
+      const errorMsg = err.response?.data?.detail || err.message || 'Login failed. Please check your credentials.';
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
