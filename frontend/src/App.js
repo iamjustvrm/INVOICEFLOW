@@ -5,6 +5,8 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Uploads from './pages/Uploads';
 import Invoices from './pages/Invoices';
+import InvoiceDetail from './pages/InvoiceDetail';
+import Settings from './pages/Settings';
 import Layout from './components/Layout';
 import './App.css';
 
@@ -40,6 +42,8 @@ function App() {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="uploads" element={<Uploads />} />
             <Route path="invoices" element={<Invoices />} />
+            <Route path="invoices/:id" element={<InvoiceDetail />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
         </Routes>
       </BrowserRouter>
