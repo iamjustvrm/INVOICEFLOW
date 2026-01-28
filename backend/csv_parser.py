@@ -15,15 +15,15 @@ COLUMN_MAPPINGS = {
     'client_name': ['customer', 'client', 'customer name', 'client name', 'bill to', 'sold to', 'company', 'business name'],
     'client_email': ['email', 'customer email', 'client email', 'contact email', 'e-mail'],
     'client_address': ['address', 'billing address', 'customer address', 'street', 'bill to address'],
-    'description': ['description', 'item', 'product/service', 'item description', 'memo', 'service description', 'product'],
-    'quantity': ['qty', 'quantity', 'units', 'hours', 'amount'],
+    'description': ['description', 'item', 'product/service', 'item description', 'service description', 'product', 'memo'],
+    'quantity': ['qty', 'quantity', 'units', 'hours'],
     'rate': ['rate', 'price', 'unit price', 'cost', 'price each', 'unit cost', 'hourly rate'],
-    'amount': ['amount', 'total', 'line total', 'extended amount', 'subtotal', 'sum'],
+    'amount': ['amount', 'line total', 'extended amount', 'line amount'],
     'subtotal': ['subtotal', 'sub total', 'sub-total', 'net amount'],
     'tax_rate': ['tax rate', 'tax %', 'tax percent', 'sales tax rate'],
     'tax_amount': ['tax', 'tax amount', 'sales tax', 'tax total', 'gst', 'vat'],
     'total': ['total', 'grand total', 'invoice total', 'balance due', 'amount due'],
-    'notes': ['notes', 'memo', 'message', 'comments', 'terms', 'description']
+    'notes': ['notes', 'message', 'comments', 'terms']
 }
 
 class CSVParser:
