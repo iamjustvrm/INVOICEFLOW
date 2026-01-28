@@ -228,10 +228,16 @@ const Invoices = () => {
                                 Generate PDF
                               </DropdownMenuItem>
                             ) : (
-                              <DropdownMenuItem onClick={() => handleDownloadPDF(invoice.pdf_url)}>
-                                <Download className="mr-2 h-4 w-4" />
-                                Download PDF
-                              </DropdownMenuItem>
+                              <>
+                                <DropdownMenuItem onClick={() => handleViewPDF(invoice.pdf_url)}>
+                                  <Eye className="mr-2 h-4 w-4" />
+                                  View PDF
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleDownloadPDF(invoice.pdf_url)}>
+                                  <Download className="mr-2 h-4 w-4" />
+                                  Download PDF
+                                </DropdownMenuItem>
+                              </>
                             )}
                             <DropdownMenuItem
                               onClick={() => handleDelete(invoice.id)}
