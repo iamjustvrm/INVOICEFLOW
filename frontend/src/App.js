@@ -7,6 +7,7 @@ import Uploads from './pages/Uploads';
 import Invoices from './pages/Invoices';
 import InvoiceDetail from './pages/InvoiceDetail';
 import Settings from './pages/Settings';
+import DemoGenerator from './pages/DemoGenerator';
 import Layout from './components/Layout';
 import './App.css';
 
@@ -44,6 +45,7 @@ function App() {
             <Route path="invoices" element={<Invoices />} />
             <Route path="invoices/:id" element={<InvoiceDetail />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="demo" element={<DemoGenerator />} />
           </Route>
         </Routes>
       </BrowserRouter>
