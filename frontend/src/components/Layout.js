@@ -9,7 +9,8 @@ import {
   Settings,
   LogOut,
   Menu,
-  X
+  X,
+  FileSpreadsheet
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -28,6 +29,7 @@ const Layout = () => {
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Invoices', href: '/invoices', icon: FileText },
     { name: 'Upload', href: '/uploads', icon: Upload },
+    { name: 'Demo CSV', href: '/demo', icon: FileSpreadsheet },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
