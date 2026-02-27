@@ -474,6 +474,86 @@ async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
     }
 
 
+# ==================== DEMO CSV GENERATOR ====================
+
+@api_router.get("/demo/formats")
+async def get_demo_formats():
+    """Get available CSV format options for demo generation"""
+    return {
+        "formats": get_available_formats(),
+        "description": "Generate sample CSV files in various accounting software formats to test the 180+ column mapping feature"
+    }
+
+@api_router.get("/demo/generate")
+async def generate_demo(
+    format: str = "quickbooks_online",
+    num_invoices: int = 5
+):
+    """
+    Generate a demo CSV file in the specified accounting software format
+    
+    Args:
+        format: CSV format (quickbooks_online, quickbooks_desktop, xero, harvest, freshbooks, wave, generic)
+        num_invoices: Number of invoices to generate (1-20)
+    """
+    # Validate inputs
+    if num_invoices < 1:
+        num_invoices = 1
+    elif num_invoices > 20:
+        num_invoices = 20
+    
+    available_formats = [f["key"] for f in get_available_formats()]
+    if format not in available_formats:
+        format = "quickbooks_online"
+    
+    # Generate CSV
+    csv_content, format_name = generate_demo_csv(format, num_invoices)
+    
+    # Create response with proper filename
+    filename = f"demo_{format}_{num_invoices}_invoices.csv"
+    
+    return StreamingResponse(
+        BytesIO(csv_content.encode('utf-8')),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": f"attachment; filename={filename}",
+            "X-Format-Name": format_name
+        }
+    )
+
+@api_router.get("/demo/preview")
+async def preview_demo(
+    format: str = "quickbooks_online",
+    num_invoices: int = 2
+):
+    """
+    Preview demo CSV content without downloading
+    
+    Args:
+        format: CSV format
+        num_invoices: Number of invoices (limited to 3 for preview)
+    """
+    if num_invoices > 3:
+        num_invoices = 3
+    
+    csv_content, format_name = generate_demo_csv(format, num_invoices)
+    
+    # Parse CSV for preview
+    lines = csv_content.strip().split('\n')
+    headers = lines[0].split(',') if lines else []
+    rows = [line.split(',') for line in lines[1:6]]  # First 5 data rows
+    
+    return {
+        "format_name": format_name,
+        "format_key": format,
+        "num_invoices": num_invoices,
+        "total_rows": len(lines) - 1,
+        "headers": headers,
+        "sample_rows": rows,
+        "csv_preview": csv_content[:2000] + ("..." if len(csv_content) > 2000 else "")
+    }
+
+
 # ==================== HEALTH CHECK ====================
 
 @api_router.get("/health")
