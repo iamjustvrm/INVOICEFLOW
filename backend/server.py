@@ -1,5 +1,5 @@
 from fastapi import FastAPI, APIRouter, UploadFile, File, HTTPException, Depends
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import List, Optional
 from datetime import datetime, timezone
 import shutil
+from io import BytesIO
 
 # Import custom modules
 from models import (
@@ -21,6 +22,7 @@ from auth import (
 from csv_parser_v2 import CSVParserV2
 from pdf_generator import PDFGenerator
 from tax_service import TaxService
+from demo_csv_generator import generate_demo_csv, get_available_formats
 
 
 ROOT_DIR = Path(__file__).parent
