@@ -74,4 +74,25 @@ export const getDashboardStats = async () => {
   return response.data;
 };
 
+// Demo CSV Generator APIs
+export const getDemoFormats = async () => {
+  const response = await api.get('/demo/formats');
+  return response.data;
+};
+
+export const previewDemoCSV = async (format, numInvoices) => {
+  const response = await api.get('/demo/preview', {
+    params: { format, num_invoices: numInvoices }
+  });
+  return response.data;
+};
+
+export const downloadDemoCSV = async (format, numInvoices) => {
+  const response = await api.get('/demo/generate', {
+    params: { format, num_invoices: numInvoices },
+    responseType: 'blob'
+  });
+  return response;
+};
+
 export default api;
